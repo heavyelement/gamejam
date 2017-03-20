@@ -1,11 +1,11 @@
 let game = new Phaser.Game('100%', '100%', Phaser.AUTO, '', { preload: preload, create: create, update: update })
 let cardTypes = ['Monster', 'Status', 'Action']
-let hand = []
+let monsterDeck = []
+let actionDeck = []
+let monsterHand = []
+let actionHand = []
 
 function preload () {
-  // Pre-loading of game assets and some pre-baked logic goes here.
-  // This step is actually mostly optional
-  // It saves the game time before running the create() function
   game.load.image('volcano', 'assets/cards/card.png')
   game.load.image('blank', 'assets/cards/blank.png')
   game.load.image('speedcloth', 'assets/board/speedcloth.png')
@@ -15,20 +15,59 @@ function preload () {
 function create () {
   game.add.sprite(0, 0, 'speedcloth')
   game.add.sprite(800, 500, 'active')
-  let volcanoCard = game.add.sprite(0, 0, 'volcano')
-  volcanoCard.inputEnabled = 'True'
-  volcanoCard.input.enableDrag(true)
+  createDeck()
+  createHand()
 
-  // TODO this 'random' algorithm strongly favors index 0 for some reason - you end up with like 4 or 5 monsters
-  do { hand.push(new Card(cardTypes[Math.floor(Math.random() * hand.length)])) }
-  while (hand.length < 5)
+  do { game.add.sprite(0, 0, monsterHand.pop().key) }
+  while (monsterHand.length > 0)
+
+  do { game.add.sprite(100, 0, actionHand.pop().key) }
+  while (actionHand.length > 0)
+
+  for (let i of game.world.children) {
+    if (i.key === 'speedcloth' || i.key === 'active') {
+    } else {
+      i.inputEnabled = true
+      i.input.enableDrag(true)
+    }
+  }
 }
 
 function update () {
+  for (let i of game.world.children) {
+    if (i.key === 'speedcloth' || i.key === 'active') {
+    } else if (i.input.isDragged === true) {
+      game.world.bringToTop(i)
+    }
+  }
+}
+
+function createDeck () {
+  do { monsterDeck.push(new Card(cardTypes[0])) }
+  while (monsterDeck.length < 12)
+
+  do { actionDeck.push(new Card(cardTypes[2])) }
+  while (actionDeck.length < 30)
+}
+
+function createHand () {
+  do { monsterHand.push(monsterDeck.pop()) }
+  while (monsterHand.length < 5)
+
+  do { actionHand.push(actionDeck.pop()) }
+  while (actionHand.length < 12)
 }
 
 class Card {
   constructor (type) {
-    this.type = type
+    let sprite
+    if (type === 'Monster') {
+      sprite = game.cache.getImage('volcano')
+    } else {
+      sprite = game.cache.getImage('blank')
+    }
+    this.key = sprite.name
+    this.cardType = type
+    this.inPlay = false
   }
 }
