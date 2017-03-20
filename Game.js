@@ -7,6 +7,7 @@ let actionHand = []
 
 function preload () {
   game.load.image('volcano', 'assets/cards/card.png')
+  game.load.image('veslither', 'assets/cards/m_veslither.png')
   game.load.image('blank', 'assets/cards/blank.png')
   game.load.image('speedcloth', 'assets/board/speedcloth.png')
   game.load.image('active', 'assets/board/active.png')
