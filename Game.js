@@ -1,52 +1,78 @@
+let game = new Phaser.Game('100%', '100%', Phaser.AUTO, '', { preload: preload, create: create, update: update })
+let cardTypes = ['Monster', 'Status', 'Action']
+let monsterDeck = []
+let actionDeck = []
+let monsterHand = []
+let actionHand = []
 
-BasicGame.Game = function (game) {
+function preload () {
+  game.load.image('gutter', 'assets/gutter.png')
+  game.load.image('volcano', 'assets/cards/card.png')
+  game.load.image('veslither', 'assets/cards/m_veslither.png')
+  game.load.image('blank', 'assets/cards/blank.png')
+  game.load.image('speedcloth', 'assets/board/speedcloth.png')
+  game.load.image('active', 'assets/board/active.png')
+}
 
-	//	When a State is added to Phaser it automatically has the following properties set on it, even if they already exist:
+function create () {
+  game.add.sprite(0, 0, 'speedcloth')
+  game.add.sprite(800, 500, 'active')
+  let bottom = game.add.sprite(0, game.world.height - 128, 'gutter')
+  bottom.scale.setTo(5, 5)
+  createDeck()
+  createHand()
 
-    this.game;		//	a reference to the currently running game
-    this.add;		//	used to add sprites, text, groups, etc
-    this.camera;	//	a reference to the game camera
-    this.cache;		//	the game cache
-    this.input;		//	the global input manager (you can access this.input.keyboard, this.input.mouse, as well from it)
-    this.load;		//	for preloading assets
-    this.math;		//	lots of useful common math operations
-    this.sound;		//	the sound manager - add a sound, play one, set-up markers, etc
-    this.stage;		//	the game stage
-    this.time;		//	the clock
-    this.tweens;    //  the tween manager
-    this.state;	    //	the state manager
-    this.world;		//	the game world
-    this.particles;	//	the particle manager
-    this.physics;	//	the physics manager
-    this.rnd;		//	the repeatable random number generator
+  do { game.add.sprite(0, 0, monsterHand.pop().key) }
+  while (monsterHand.length > 0)
 
-    //	You can use any of these from any function within this State.
-    //	But do consider them as being 'reserved words', i.e. don't create a property for your own game called "world" or you'll over-write the world reference.
+  do { game.add.sprite(100, 0, actionHand.pop().key) }
+  while (actionHand.length > 0)
 
-};
+  for (let i of game.world.children) {
+    if (i.key === 'speedcloth' || i.key === 'active') {
+    } else {
+      game.scale.scaleSprite(i, 100, 100) // This also scales the gutter which isn't what we want lol
+      i.inputEnabled = true
+      i.input.enableDrag(true)
+    }
+  }
+}
 
-BasicGame.Game.prototype = {
+function update () {
+  for (let i of game.world.children) {
+    if (i.key === 'speedcloth' || i.key === 'active') {
+    } else if (i.input.isDragged === true) {
+      game.world.bringToTop(i)
+    }
+  }
+}
 
-	create: function () {
+function createDeck () {
+  do { monsterDeck.push(new Card(cardTypes[0])) }
+  while (monsterDeck.length < 12)
 
-		//	Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
+  do { actionDeck.push(new Card(cardTypes[2])) }
+  while (actionDeck.length < 30)
+}
 
-	},
+function createHand () {
+  do { monsterHand.push(monsterDeck.pop()) }
+  while (monsterHand.length < 5)
 
-	update: function () {
+  do { actionHand.push(actionDeck.pop()) }
+  while (actionHand.length < 12)
+}
 
-		//	Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
-
-	},
-
-	quitGame: function (pointer) {
-
-		//	Here you should destroy anything you no longer need.
-		//	Stop music, delete sprites, purge caches, free resources, all that good stuff.
-
-		//	Then let's go back to the main menu.
-		this.state.start('MainMenu');
-
-	}
-
-};
+class Card {
+  constructor (type) {
+    let sprite
+    if (type === 'Monster') {
+      sprite = game.cache.getImage('volcano')
+    } else {
+      sprite = game.cache.getImage('blank')
+    }
+    this.key = sprite.name
+    this.cardType = type
+    this.inPlay = false
+  }
+}
