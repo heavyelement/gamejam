@@ -1,0 +1,10 @@
+{
+    "extends": "standard",
+    "rules": {
+        "no-undef":"off"
+    },
+    "plugins": [
+        "standard",
+        "promise"
+    ]
+}
