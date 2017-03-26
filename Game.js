@@ -31,6 +31,7 @@ function create () {
   for (let i of game.world.children) {
     if (i.key === 'speedcloth' || i.key === 'active') {
     } else {
+      game.scale.scaleSprite(i, 100, 100) // This also scales the gutter which isn't what we want lol
       i.inputEnabled = true
       i.input.enableDrag(true)
     }
