@@ -6,6 +6,7 @@ let monsterHand = []
 let actionHand = []
 
 function preload () {
+  game.load.image('gutter', 'assets/gutter.png')
   game.load.image('volcano', 'assets/cards/card.png')
   game.load.image('veslither', 'assets/cards/m_veslither.png')
   game.load.image('blank', 'assets/cards/blank.png')
@@ -16,6 +17,8 @@ function preload () {
 function create () {
   game.add.sprite(0, 0, 'speedcloth')
   game.add.sprite(800, 500, 'active')
+  let bottom = game.add.sprite(0, game.world.height - 128, 'gutter')
+  bottom.scale.setTo(5, 5)
   createDeck()
   createHand()
 
